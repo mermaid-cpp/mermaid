@@ -1,0 +1,50 @@
+# This is a basic workflow to validate commits for conventional commits spec format.
+# See the spec summary for details: https://www.conventionalcommits.org/en/v1.0.0/#summary
+name: Lint commit messsages
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "master" and "dev" branches
+  push:
+    branches: [ "master", "dev" ]
+  pull_request:
+    branches: [ "master", "dev" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # this workflow job has been copied from https://github.com/conventional-changelog/commitlint/blob/master/docs/guides-ci-setup.md
+  # and validates commits' messages for https://www.conventionalcommits.org/en/v1.0.0/#summary spec. 
+  commitlint:
+      runs-on: ubuntu-22.04
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0
+        - name: Install required dependencies
+          run: |
+            apt update
+            apt install -y sudo
+            sudo apt install -y git curl
+            curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
+            sudo DEBIAN_FRONTEND=noninteractive apt install -y nodejs
+        - name: Print versions
+          run: |
+            git --version
+            node --version
+            npm --version
+            npx commitlint --version
+        - name: Install commitlint
+          run: |
+            npm install conventional-changelog-conventionalcommits
+            npm install commitlint@latest
+  
+        - name: Validate current commit (last commit) with commitlint
+          if: github.event_name == 'push'
+          run: npx commitlint --from HEAD~1 --to HEAD --verbose
+  
+        - name: Validate PR commits with commitlint
+          if: github.event_name == 'pull_request'
+          run: npx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
