@@ -52,6 +52,13 @@ private:
 	std::string label = "";
 };
 
+class pie : public diagram {
+public:
+	std::string_view name() const noexcept override {
+		return "pie";
+	}
+};
+
 } // namespace mermaid::diagrams
 
 namespace mermaid::syntax {
