@@ -438,17 +438,28 @@ static constexpr void test_parser_test_diagram() {
 	static_assert(check_res(tests[8]));
 }
 
+constexpr std::expected<std::unique_ptr<core::diagram>, parse_status> parse_mermaid_pie_chart(parse_state &state) {
+	// main pie diagram parameters
+	bool show_data = false;
+	std::string title = "";
+	state.advance_to(4); // "pie "
+	if (starts_with_and_advance(state, "showData")) {
+		show_data = true;
+	}
+	return std::unexpected(parse_status{});
+}
+
 constexpr std::expected<std::unique_ptr<core::diagram>, parse_status> parse_mermaid(parse_state &state) {
 	using namespace std::string_view_literals;
 
 	const auto &in = state.parsed_string;
 
-
 	bool known_diagram = false;
 	using factory = decltype(parse_test_diagram<parse_state &>);
 	using named_factory = std::pair<std::string_view, factory*>;
 	std::array known_diagram_parsers{
-		named_factory{"test", parse_test_diagram<parse_state &>}
+		named_factory{"test", parse_test_diagram<parse_state &>},
+		named_factory{"pie", parse_mermaid_pie_chart}
 	};
 
 	auto parser = matches_with(state, known_diagram_parsers, [](auto &item) { return item.first; });
