@@ -277,10 +277,26 @@ static bool test_all() {
 
 static const bool test_it = test_all();
 
+constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid_pie_chart(parse_state &state) {
+	// main pie diagram parameters
+	bool show_data = false;
+	std::string title = "";
+	state.advance_to(4); // "pie "
+	if (starts_with_and_advance(state, "showData")) {
+		show_data = true;
+	}
+	return std::unexpected(parse_status{});
+}
+
 constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid(parse_state &state) {
 	const auto &in = state.parsed_string;
 
 	bool test_diag = false;
+	if (in.starts_with("pie")) {
+		auto res = parse_mermaid_pie_chart(state);
+		return res;
+	}
+
 	if (starts_with_and_advance(state, "test")) {
 		test_diag = true;
 	}
