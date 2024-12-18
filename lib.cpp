@@ -220,8 +220,7 @@ std::ostream &explain_parse_error(std::ostream &os, const mermaid_cpp::parse_api
 		line_for_context.remove_prefix(res + 1);
 		counter++;
 	}
-	auto res = line_for_context.find_first_of("\n");
-	if (res != std::string_view::npos) {
+	if (auto res = line_for_context.find_first_of("\n"); res != std::string_view::npos) {
 		line_for_context.remove_suffix(line_for_context.size() - res);
 	}
 	os << line_for_context << "\n";
@@ -317,8 +316,7 @@ std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid_md
 		return state.make_unexpected_status("Diagram is empty");
 	}
 
-	auto cur_chr = state.cur_char();
-	if (cur_chr != '\n') {
+	if (auto cur_chr = state.cur_char(); cur_chr != '\n') {
 		return state.make_unexpected_status(
 				fmt::format("Expected newline, got unknown token '{}'{}",
 						cur_chr, cur_chr == '\0' ? "EOF" : ""), 1
