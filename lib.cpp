@@ -310,7 +310,7 @@ std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid_md
 	constexpr std::string_view mermaid_md_block_end = "```";
 
 	if (!starts_with_and_advance(state, mermaid_md_block_begin)) {
-		return std::unexpected(parse_status{1, 1, 3, "Expected markdown begin block token with mermaid block id(\"```mermaid\")"});
+		return state.make_unexpected_status("Expected markdown begin block token with mermaid block id(\"```mermaid\")", 3);
 	}
 
 	if (!state.has_tokens()) {
@@ -336,7 +336,7 @@ std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid_md
 	skip_all_ws(state);
 
 	if (!starts_with(state, mermaid_md_block_end)) {
-		return std::unexpected(parse_status{state.line, state.column,  3, "Expected markdown end block token (\"```\")"});
+		return state.make_unexpected_status("Expected markdown end block token (\"```\")",3));
 	}
 	return result;
 }
