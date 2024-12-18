@@ -240,7 +240,7 @@ std::ostream & operator <<(std::ostream &os, const parse_status &status) {
 		return os;
 	}
 
-	static std::string_view statuses[] = {
+	static const std::string_view statuses[] = {
 		"Success",
 		"Info",
 		"Warning",
@@ -275,10 +275,10 @@ static bool test_all() {
 	return true;
 }
 
-static bool test_it = test_all();
+static const bool test_it = test_all();
 
 constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid(parse_state &state) {
-	auto &in = state.parsed_string;
+	const auto &in = state.parsed_string;
 
 	bool test_diag = false;
 	if (starts_with_and_advance(state, "test")) {
