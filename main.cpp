@@ -35,7 +35,7 @@ void image_to_ascii(const std::span<unsigned char> &data, size_t width, size_t h
 void image_data_to_file(const std::span<unsigned char> &data, size_t width, size_t height, size_t channels, std::filesystem::path outfile);
 
 template <typename T, typename E>
-inline constexpr decltype(auto) error_or(const T& t, const E& e) {
+constexpr decltype(auto) error_or(const T& t, const E& e) {
 	return t.has_value() ? e : t.error();
 }
 
