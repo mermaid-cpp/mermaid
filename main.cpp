@@ -20,7 +20,7 @@ namespace fs = std::filesystem;
 #endif
 
 std::vector<char> load_ttf_file(const fs::path &p = MERMAID_TESTAPP_TTF_FILENAME) {
-	std::ifstream font(p.generic_string().c_str());
+	std::ifstream font(p.generic_string().c_str(), std::ios::binary);
 	if (!font) {
 		return {};
 	}
