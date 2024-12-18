@@ -57,7 +57,6 @@ test
 	std::cerr << "<expected> version: " <<  __cpp_lib_expected << std::endl;
 	std::cerr << error_or(result, success_parse_status) << std::endl;
 	assert(result);
-	// return true;
 
 	const size_t W = 100, H = 50;
 	canvas_ity::canvas canvas(W, H);
@@ -91,7 +90,6 @@ vzhuh```)");
 }
 
 int main() {
-	//
 	auto r1 = test_invalid_app();
 
 	auto r = test_app();
