@@ -335,12 +335,6 @@ std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid_md
 
 	skip_all_ws(state);
 
-	/*
-	while (whitespace.find_first_of(state.parsed_string[0]) != std::string_view::npos) {
-		if (!advance_to_n_check_newline(state, 1)) {
-			break;
-		}
-	}*/
 	if (!starts_with(state, mermaid_md_block_end)) {
 		return std::unexpected(parse_status{state.line, state.column,  3, "Expected markdown end block token (\"```\")"});
 	}
