@@ -66,7 +66,7 @@ public:
 	}
 
 	constexpr bool operator ==(const parse_status &st) const noexcept {
-		return line_ == st.line_ && column_ == st.line_ && range_ == st.range_;
+		return line_ == st.line_ && column_ == st.column_ && range_ == st.range_ && type_ == st.type_;
 	}
 
 	constexpr bool operator !=(const parse_status &st) const noexcept {
