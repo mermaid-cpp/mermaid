@@ -1,7 +1,7 @@
 [requires]
 canvas_ity/1.00
-stb/cci.20240213
-fmt/11.0.2
+stb/cci.20240531
+fmt/12.2.0
 
 [generators]
 CMakeDeps
