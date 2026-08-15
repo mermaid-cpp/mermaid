@@ -11,9 +11,9 @@
 #include <iomanip>
 #include <string>
 
-#include <fmt/format.h>
-
 #include <assert.h>
+
+#include <fmt/format.h>
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>

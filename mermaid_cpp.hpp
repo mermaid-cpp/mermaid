@@ -1,12 +1,10 @@
 #ifndef LB_MERMAID_CPP_H_
 #define LB_MERMAID_CPP_H_
 #include <expected>
+#include <iosfwd>
+#include <memory>
 #include <string_view>
 #include <string>
-#include <optional>
-#include <memory>
-
-#include <iosfwd>
 
 namespace mermaid_cpp::diagrams {
 
