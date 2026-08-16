@@ -40,6 +40,30 @@ constexpr decltype(auto) error_or(const T& t, const E& e) {
 	return t.has_value() ? e : t.error();
 }
 
+bool render_diagram() {
+	const size_t W = 100, H = 50;
+	canvas_ity::canvas canvas(W, H);
+	auto font = load_ttf_file(MERMAID_TESTAPP_TTF_FILENAME);
+	if (!font.size()) {
+		std::cerr << "Can't open ttf file\n";
+		return false;
+	}
+
+	if (!canvas.set_font(reinterpret_cast<const unsigned char*>(font.data()), font.size(), 30)) {
+		std::cerr << "Can't load ttf data\n";
+	}
+	canvas.set_color(canvas_ity::stroke_style, 1.0f, 0.9f, 0.2f, 1.0f );
+	std::cerr << "test text width: " << canvas.measure_text("Test") << "\n" << std::endl;
+	canvas.stroke_text("Test", 14, 35);
+
+	std::vector<unsigned char> canvas_data(W*H*4);
+	canvas.get_image_data(canvas_data.data(), W, H, W * 4, 0, 0);
+	image_to_ascii(canvas_data, W, H, 4);
+	image_data_to_file(canvas_data, W, H, 4, "out.png");
+
+	return true;
+}
+
 bool test_app() {
 	auto success_parse_status = mermaid_cpp::parse_api::parse_status::success();
 	// empty test.
@@ -59,25 +83,9 @@ test
 	std::cerr << error_or(result, success_parse_status) << std::endl;
 	assert(result);
 
-	const size_t W = 100, H = 50;
-	canvas_ity::canvas canvas(W, H);
-	auto font = load_ttf_file();
-	if (!font.size()) {
-		std::cerr << "Can't open ttf file\n";
-		return false;
-	}
 
-	if (!canvas.set_font(reinterpret_cast<const unsigned char*>(font.data()), font.size(), 30)) {
-		std::cerr << "Can't load ttf data\n";
-	}
-	canvas.set_color( canvas_ity::stroke_style, 1.0f, 0.9f, 0.2f, 1.0f );
-	std::cerr << "test text width: " << canvas.measure_text("Test") << "\n" << std::endl;
-	canvas.stroke_text("Test", 14, 35);
 
-	std::vector<unsigned char> canvas_data(W*H*4);
-	canvas.get_image_data(canvas_data.data(), W, H, W * 4, 0, 0);
-	image_to_ascii(canvas_data, W, H, 4);
-	image_data_to_file(canvas_data, W, H, 4, "out.png");
+	render_diagram();
 	return result.operator bool();
 }
 
