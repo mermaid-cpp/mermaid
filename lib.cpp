@@ -9,7 +9,9 @@
 #include <functional>
 #include <iostream>
 #include <iomanip>
+#include <memory>
 #include <string>
+#include <string_view>
 
 #include <assert.h>
 
