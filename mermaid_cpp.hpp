@@ -23,9 +23,12 @@ public:
 
 class test_diagram : public diagram {
 public:
+	constexpr test_diagram(std::string l = ""): label(l) {}
 	std::string_view name() const noexcept override {
 		return "test";
 	}
+private:
+	std::string label = "";
 };
 
 } // namespace mermaid_cpp::diagrams

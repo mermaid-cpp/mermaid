@@ -279,6 +279,30 @@ static bool test_all() {
 
 static const bool test_it = test_all();
 
+template <typename T = parse_state>
+constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_test_diagram(T &&state) {
+	const auto &in = state.parsed_string;
+	std::string_view test_label =[&in, &state]() {
+		auto np = std::string_view::npos;
+		auto newline_pos = in.find('\n');
+		// no newline -> empty test diagram
+		if (newline_pos == np) {
+			return std::string_view("");
+		}
+		std::string_view new_label = in;
+		new_label.remove_suffix(in.length() - newline_pos);
+		// has markdown end marker -> empty test diagram
+		if (new_label.find("```") != np) {
+			return std::string_view("");
+		}
+		state.advance_to(newline_pos);
+		return new_label;
+	}();
+	return std::make_unique<diagrams::test_diagram>(std::string{test_label.data(), test_label.size()});
+}
+
+static_assert(parse_test_diagram(parse_state{.parsed_string = "\nTest```"}).has_value());
+
 constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid(parse_state &state) {
 	const auto &in = state.parsed_string;
 
@@ -302,7 +326,7 @@ constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_
 	if (!test_diag) {
 		return std::make_unique<diagrams::empty_diagram>();
 	}
-	return std::make_unique<diagrams::test_diagram>();
+	return parse_test_diagram(state);
 }
 
 std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid_md(std::string_view in) {
