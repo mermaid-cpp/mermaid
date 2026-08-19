@@ -286,7 +286,7 @@ constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_
 	}
 
 	if (state.parsed_string.empty()) {
-		return state.make_unexpected_status("Unexpected EOF while parsing test diagram");
+		return state.make_unexpected_status("Unexpected EOF while parsing diagram");
 	}
 	if (in[0] == '\n') {
 		advance_to_n_check_newline(state, 1);
