@@ -367,24 +367,75 @@ constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_
 	const auto &in = state.parsed_string;
 	std::string_view test_label =[&in, &state]() {
 		auto np = std::string_view::npos;
-		auto newline_pos = in.find('\n');
-		// no newline -> empty test diagram
-		if (newline_pos == np) {
-			return std::string_view("");
-		}
+
+		auto end_of_diagram = in.find("```");
 		std::string_view new_label = in;
-		new_label.remove_suffix(in.length() - newline_pos);
-		// has markdown end marker -> empty test diagram
-		if (new_label.find("```") != np) {
-			return std::string_view("");
+		if (end_of_diagram != np) {
+			new_label.remove_suffix(in.length() - end_of_diagram);
 		}
-		state.advance_to(newline_pos);
+		// trim trailing whitespace (until there are
+		// non-whitespace characters or newline)
+		size_t i = 0;
+		bool all_whitespace_on_last_line = false;
+		for (const auto c : new_label
+				| std::views::reverse) {
+			if (c != '\n' &&
+				c != ' ' &&
+				c != '\t') {
+				break;
+			} else if (c == '\n') {
+				all_whitespace_on_last_line = true;
+				break;
+			}
+			++i;
+		}
+		if (all_whitespace_on_last_line) {
+			new_label.remove_suffix(i + 1);
+		}
+		state.advance_to(new_label.size());
 		return new_label;
 	}();
 	return std::make_unique<diagrams::test_diagram>(std::string{test_label.data(), test_label.size()});
 }
 
 static_assert(parse_test_diagram(parse_state{.parsed_string = "\nTest```"}).has_value());
+
+static constexpr void test_parser_test_diagram() {
+	struct test_data {
+		std::string_view text;
+		diagrams::test_diagram expected;
+	};
+	constexpr test_data tests[] {
+		{"", {""}},
+		{"```", {""}},
+		{"meow```", {"meow"}},
+		{"meow\n```", {"meow"}},
+		{"meow\n	```", {"meow"}},
+		{"meow\n	", {"meow"}},
+		{"meow\n", {"meow"}},
+		{"meow\n  purr ", {"meow\n  purr "}},
+		{"meow\n  purr ```", {"meow\n  purr "}},
+	};
+	constexpr auto check_res = [](const test_data &d) {
+		return
+			*static_cast<diagrams::test_diagram*>(
+				parse_test_diagram(
+					parse_state{
+						.parsed_string = d.text})
+				.value().get()
+			) == d.expected;
+	};
+
+	static_assert(check_res(tests[0]));
+	static_assert(check_res(tests[1]));
+	static_assert(check_res(tests[2]));
+	static_assert(check_res(tests[3]));
+	static_assert(check_res(tests[4]));
+	static_assert(check_res(tests[5]));
+	static_assert(check_res(tests[6]));
+	static_assert(check_res(tests[7]));
+	static_assert(check_res(tests[8]));
+}
 
 constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid(parse_state &state) {
 	const auto &in = state.parsed_string;

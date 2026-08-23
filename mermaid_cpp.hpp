@@ -27,6 +27,9 @@ public:
 	std::string_view name() const noexcept override {
 		return "test";
 	}
+	constexpr bool operator ==(const test_diagram &d) const noexcept {
+		return label == d.label;
+	}
 private:
 	std::string label = "";
 };
