@@ -123,11 +123,13 @@ jobs:
 
             - name: Detect build profile
               run: |
-                  conan profile detect
+                  conan \
+                      profile detect
 
             - name: Install dependencies
               run: |
-                  conan install . \
+                  conan \
+                      install . \
                       --build=missing \
                       -of conan-deps \
                       -s build_type=${{ matrix.config }}
@@ -149,7 +151,9 @@ jobs:
                       -S ${{ env.workspace }} \
                       -B ${{ env.workspace }}/build \
                       -G "Ninja Multi-Config" \
-                      -D CMAKE_CXX_COMPILER=${{ matrix.compiler }}
+                      -D CMAKE_CXX_COMPILER=${{ matrix.compiler }} \
+                      -DCMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" \
+                      -DCMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
 
             - name: Build project
               run: |
