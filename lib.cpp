@@ -438,29 +438,42 @@ static constexpr void test_parser_test_diagram() {
 }
 
 constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid(parse_state &state) {
+	using namespace std::string_view_literals;
+
 	const auto &in = state.parsed_string;
 
-	bool test_diag = false;
-	if (starts_with_and_advance(state, "test")) {
-		test_diag = true;
+
+	bool known_diagram = false;
+	using factory = decltype(parse_test_diagram<parse_state &>);
+	using named_factory = std::pair<std::string_view, factory*>;
+	std::array known_diagram_parsers{
+		named_factory{"test", parse_test_diagram<parse_state &>}
+	};
+
+	auto parser = matches_with(state, known_diagram_parsers, [](auto &item) { return item.first; });
+	known_diagram = parser != known_diagram_parsers.end();
+	if (known_diagram) {
+		state.advance_to(parser->first.size());
 	}
 
 	if (state.parsed_string.empty()) {
 		return state.make_unexpected_status("Unexpected EOF while parsing diagram");
 	}
+
+	// skip newline after diagram type
 	if (in[0] == '\n') {
 		advance_to_n_check_newline(state, 1);
 	} else {
 		return state.make_unexpected_status(
-			test_diag ? "Expected newline after diagram type" : "Diagram is empty", 1,
-			test_diag ? parse_status::type::error : parse_status::type::info
+			known_diagram ? "Expected newline after diagram type" : "Diagram is empty", 1,
+			known_diagram ? parse_status::type::error : parse_status::type::info
 		);
 	}
 
-	if (!test_diag) {
+	if (!known_diagram) {
 		return std::make_unique<diagrams::empty_diagram>();
 	}
-	return parse_test_diagram(state);
+	return parser->second(state);
 }
 
 std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid_md(std::string_view in) {
