@@ -4,12 +4,14 @@
  */
 #include <mermaid_cpp.hpp>
 
+#include <algorithm>
 #include <concepts>
 #include <expected>
 #include <functional>
 #include <iostream>
 #include <iomanip>
 #include <memory>
+#include <ranges>
 #include <string>
 #include <string_view>
 
@@ -123,6 +125,87 @@ scoped_state_restorer(T &, bool) -> scoped_state_restorer<T>;
 
 [[deprecated("Use starts_with_and_advance()")]] constexpr bool starts_with(const parse_state &st, std::string_view substr, bool count_chars = true) {
 		return st.parsed_string.starts_with(substr);
+}
+
+template <typename Container, typename Key>
+concept could_find_items_by_key = requires(Container &c, const Key &key) {
+	{ c.find(key) };
+};
+
+auto is_alpha_num_underscore = [](char c) {
+	return c >= 'a' && c <= 'z'
+		|| c >= 'A' && c <= 'Z'
+		|| c >= '0' && c <= '9'
+		|| c == '_';
+};
+
+/// Determines the matched token boundaries (from current position
+/// in @ref st until @ref token_sentinel_fn returns false) and
+/// uses this token to match the matchers in @ref what.
+/// @note Depending on @ref what type, the member function find() or
+/// generic find() algorithm will be used.
+/// @returns Result of find() operation.
+template <typename Matchers, typename TokenSentinel, typename Proj = std::identity>
+constexpr decltype(auto) match_next_token(const parse_state &st, const Matchers &what, TokenSentinel token_sentinel_fn, Proj proj = {}) {
+	std::string_view token_to_match = st.parsed_string;
+
+	auto result = std::ranges::find_if_not(token_to_match, token_sentinel_fn);
+	std::string_view t2{token_to_match.begin(), result};
+	if constexpr (could_find_items_by_key<Matchers, std::string_view>) {
+		return what.find(t2);
+	} else {
+		return std::ranges::find(what, t2, proj);
+	}
+}
+
+template <typename Matchers, typename Proj = std::identity>
+constexpr decltype(auto) matches_with(const parse_state &st, const Matchers &what, Proj proj = {}) {
+	return match_next_token(st, what, is_alpha_num_underscore, std::forward<Proj>(proj));
+}
+
+static constexpr bool test_matchers() {
+	struct test_data {
+		parse_state state;
+		bool matched;
+	};
+
+	constexpr test_data states[] {
+		{{.parsed_string = ""}, false},
+		{{.parsed_string = "test"}, true},
+		{{.parsed_string = "test2"}, false},
+		{{.parsed_string = "test "}, true},
+	};
+	constexpr std::array<std::string_view, 2> matchers{"test", "sequenceDiagram"};
+	using p = std::pair<std::string_view, void(*)()>;
+	constexpr std::array matchers2{
+		p{"test", []{fmt::print("test");}},
+		p{"sequenceDiagram", []{fmt::print("sequenceDiagram");}},
+
+	};
+
+	constexpr auto check_match = [](const test_data &d, const auto &matchers) {
+		return (
+			(matches_with(d.state, matchers) != matchers.end()) == d.matched
+		       );
+	};
+
+	constexpr auto check_match2 = [](const test_data &d, const auto &matchers) {
+		return (
+			(matches_with(d.state, matchers, [](const auto &v) {return v.first; }) != matchers.end()) == d.matched
+		       );
+	};
+
+	static_assert(check_match(states[0], matchers));
+	static_assert(check_match(states[1], matchers));
+	static_assert(check_match(states[2], matchers));
+	static_assert(check_match(states[3], matchers));
+
+	static_assert(check_match2(states[0], matchers2));
+	static_assert(check_match2(states[1], matchers2));
+	static_assert(check_match2(states[2], matchers2));
+	static_assert(check_match2(states[3], matchers2));
+
+	return true;
 }
 
 // FIXME: extract all from starts_with
