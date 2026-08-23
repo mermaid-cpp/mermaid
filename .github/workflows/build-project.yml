@@ -1,0 +1,172 @@
+# SPDX-FileCopyrightText: 2022-2026 leha-bot and contributors
+#
+# SPDX-License-Identifier: BSL-1.0 OR BlueOak-1.0.0
+
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+
+name: "Build project"
+
+on:
+    push:
+        branches:
+            - "**"
+        paths:
+            - ".github/workflows/**"
+            - "cmake/**"
+            - "*.h"
+            - "*.hpp"
+            - "*.cpp"
+            - "*.cmake"
+            - "CMakeLists.txt"
+
+    pull_request:
+        branches:
+            - "**"
+        paths:
+            - ".github/workflows/**"
+            - "cmake/**"
+            - "*.h"
+            - "*.hpp"
+            - "*.cpp"
+            - "*.cmake"
+            - "CMakeLists.txt"
+
+defaults:
+    run:
+        shell: sh
+
+jobs:
+    build-project:
+        name: "Build project"
+
+        strategy:
+            matrix:
+                system:
+                    - windows-2022
+                    - ubuntu-24.04
+                config:
+                    - Debug
+                    - Release
+                compiler:
+                    - cl
+                    - clang++-18
+                    - g++-14
+                exclude:
+                    - {
+                          system: windows-2022,
+                          config: Debug,
+                          compiler: clang++-18
+                      }
+                    - {
+                          system: windows-2022,
+                          config: Release,
+                          compiler: clang++-18
+                      }
+                    - {
+                          system: windows-2022,
+                          config: Debug,
+                          compiler: g++-14
+                      }
+                    - {
+                          system: windows-2022,
+                          config: Release,
+                          compiler: g++-14
+                      }
+                    - {
+                          system: ubuntu-24.04,
+                          config: Debug,
+                          compiler: cl
+                      }
+                    - {
+                          system: ubuntu-24.04,
+                          config: Release,
+                          compiler: cl
+                      }
+            fail-fast: false
+
+        runs-on: ${{ matrix.system }}
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v7
+              with:
+                  fetch-depth: 0
+
+            - name: Setup GCC and Clang
+              if: ${{ runner.os == 'Linux' }}
+              run: |
+                  sudo apt update && \
+                  sudo apt install -y \
+                      g++-14 \
+                      clang-18
+
+            - name: Setup Ninja
+              uses: imesense/gha-setup-ninja@v0.2
+
+            - name: Setup Conan
+              uses: imesense/gha-setup-conan@v0.1
+
+            - name: Set path (Windows)
+              if: ${{ runner.os == 'Windows' }}
+              shell: pwsh
+              run: |
+                  $github_workspace = "${{ github.workspace }}"
+                  $workspace = ($github_workspace -replace '\\','/')
+                  Add-Content -Path $env:GITHUB_ENV -Value "workspace=$workspace"
+
+            - name: Set path (Linux)
+              if: ${{ runner.os != 'Windows' }}
+              shell: sh
+              run: |
+                  export workspace=${{ github.workspace }}
+                  echo "workspace=$workspace" >> $GITHUB_ENV
+
+            - name: Detect build profile
+              run: |
+                  conan profile detect
+
+            - name: Install dependencies
+              run: |
+                  conan install . \
+                      --build=missing \
+                      -of conan-deps \
+                      -s build_type=${{ matrix.config }}
+
+            - name: Configure project (Windows)
+              if: ${{ runner.os == 'Windows' }}
+              run: |
+                  cmake \
+                      -S ${{ env.workspace }} \
+                      -B ${{ env.workspace }}/build \
+                      -G "Ninja Multi-Config" \
+                      -DCMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" \
+                      -DCMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
+
+            - name: Configure project (Linux)
+              if: ${{ runner.os == 'Linux' }}
+              run: |
+                  cmake \
+                      -S ${{ env.workspace }} \
+                      -B ${{ env.workspace }}/build \
+                      -G "Ninja Multi-Config" \
+                      -D CMAKE_CXX_COMPILER=${{ matrix.compiler }}
+
+            - name: Build project
+              run: |
+                  cmake \
+                      --build ${{ env.workspace }}/build \
+                      --config ${{ matrix.config }}
+
+            - name: Install project
+              run: |
+                  cmake \
+                      --install ${{ env.workspace }}/build \
+                      --config ${{ matrix.config }} \
+                      --prefix ${{ env.workspace }}/build/install
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v7
+              with:
+                  name: ${{ github.event.repository.name }}-${{ matrix.system }}-${{ matrix.compiler }}-${{ matrix.config }}-${{ github.sha }}
+                  path: |
+                      ${{ github.workspace }}/build/install/
