@@ -26,7 +26,7 @@ jobs:
         strategy:
             matrix:
                 system:
-                    - ubuntu-24.04
+                    - ubuntu-slim
 
         runs-on: ${{ matrix.system }}
 
