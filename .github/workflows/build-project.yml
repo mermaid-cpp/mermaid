@@ -52,37 +52,43 @@ jobs:
                     - {
                           system: windows-2022,
                           config: Debug,
-                          compiler: cl
+                          compiler-c: cl,
+                          compiler-cxx: cl
                       }
                     # Windows Server 2022, Visual C++, Release
                     - {
                           system: windows-2022,
                           config: Release,
-                          compiler: cl
+                          compiler-c: cl,
+                          compiler-cxx: cl
                       }
                     # Ubuntu Linux 24.04, GCC 14, Debug
                     - {
                           system: ubuntu-24.04,
                           config: Debug,
-                          compiler: g++-14
+                          compiler-c: gcc-14,
+                          compiler-cxx: g++-14
                       }
                     # Ubuntu Linux 24.04, GCC 14, Release
                     - {
                           system: ubuntu-24.04,
                           config: Release,
-                          compiler: g++-14
+                          compiler-c: gcc-14,
+                          compiler-cxx: g++-14
                       }
                     # Ubuntu Linux 24.04, Clang 18, Debug
                     - {
                           system: ubuntu-24.04,
                           config: Debug,
-                          compiler: clang++-19
+                          compiler-c: clang-19,
+                          compiler-cxx: clang++-19
                       }
                     # Ubuntu Linux 24.04, Clang 18, Release
                     - {
                           system: ubuntu-24.04,
                           config: Release,
-                          compiler: clang++-19
+                          compiler-c: clang-19,
+                          compiler-cxx: clang++-19
                       }
             fail-fast: false
 
@@ -153,7 +159,8 @@ jobs:
                       -S ${{ env.workspace }} \
                       -B ${{ env.workspace }}/build \
                       -G "Ninja Multi-Config" \
-                      -D CMAKE_CXX_COMPILER=${{ matrix.compiler }} \
+                      -D CMAKE_C_COMPILER=${{ matrix.compiler-c }} \
+                      -D CMAKE_CXX_COMPILER=${{ matrix.compiler-cxx }} \
                       -DCMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" \
                       -DCMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
 
@@ -173,6 +180,6 @@ jobs:
             - name: Upload artifacts
               uses: actions/upload-artifact@v7
               with:
-                  name: ${{ github.event.repository.name }}-${{ matrix.system }}-${{ matrix.compiler }}-${{ matrix.config }}-${{ github.sha }}
+                  name: ${{ github.event.repository.name }}-${{ matrix.system }}-${{ matrix.compiler-cxx }}-${{ matrix.config }}-${{ github.sha }}
                   path: |
                       ${{ github.workspace }}/build/install/
