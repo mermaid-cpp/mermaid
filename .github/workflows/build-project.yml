@@ -47,40 +47,42 @@ jobs:
                 config:
                     - Debug
                     - Release
-                compiler:
-                    - cl
-                    - clang++-18
-                    - g++-14
-                exclude:
+                include:
+                    # Windows Server 2022, Visual C++, Debug
                     - {
                           system: windows-2022,
-                          config: Debug,
-                          compiler: clang++-18
-                      }
-                    - {
-                          system: windows-2022,
-                          config: Release,
-                          compiler: clang++-18
-                      }
-                    - {
-                          system: windows-2022,
-                          config: Debug,
-                          compiler: g++-14
-                      }
-                    - {
-                          system: windows-2022,
-                          config: Release,
-                          compiler: g++-14
-                      }
-                    - {
-                          system: ubuntu-24.04,
                           config: Debug,
                           compiler: cl
                       }
+                    # Windows Server 2022, Visual C++, Release
+                    - {
+                          system: windows-2022,
+                          config: Release,
+                          compiler: cl
+                      }
+                    # Ubuntu Linux 24.04, GCC 14, Debug
+                    - {
+                          system: ubuntu-24.04,
+                          config: Debug,
+                          compiler: g++-14
+                      }
+                    # Ubuntu Linux 24.04, GCC 14, Release
                     - {
                           system: ubuntu-24.04,
                           config: Release,
-                          compiler: cl
+                          compiler: g++-14
+                      }
+                    # Ubuntu Linux 24.04, Clang 18, Debug
+                    - {
+                          system: ubuntu-24.04,
+                          config: Debug,
+                          compiler: clang++-19
+                      }
+                    # Ubuntu Linux 24.04, Clang 18, Release
+                    - {
+                          system: ubuntu-24.04,
+                          config: Release,
+                          compiler: clang++-19
                       }
             fail-fast: false
 
@@ -98,7 +100,7 @@ jobs:
                   sudo apt update && \
                   sudo apt install -y \
                       g++-14 \
-                      clang-18
+                      clang-19
 
             - name: Setup Ninja
               uses: imesense/gha-setup-ninja@v0.2
