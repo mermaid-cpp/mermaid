@@ -40,7 +40,8 @@ constexpr decltype(auto) error_or(const T& t, const E& e) {
 	return t.has_value() ? e : t.error();
 }
 
-bool render_diagram() {
+bool render_diagram(std::string_view outfile = "out.png") {
+
 	const size_t W = 100, H = 50;
 	canvas_ity::canvas canvas(W, H);
 	auto font = load_ttf_file(MERMAID_TESTAPP_TTF_FILENAME);
@@ -59,7 +60,7 @@ bool render_diagram() {
 	std::vector<unsigned char> canvas_data(W*H*4);
 	canvas.get_image_data(canvas_data.data(), W, H, W * 4, 0, 0);
 	image_to_ascii(canvas_data, W, H, 4);
-	image_data_to_file(canvas_data, W, H, 4, "out.png");
+	image_data_to_file(canvas_data, W, H, 4, outfile);
 
 	return true;
 }
