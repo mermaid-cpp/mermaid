@@ -6,6 +6,16 @@
 #include <string_view>
 #include <string>
 
+#ifndef __has_cpp_attribute
+#define __has_cpp_attribute(x) 0
+#else
+#if __has_cpp_attribute(clang::lifetimebound)
+#define MERMAID_LIFETIMEBOUND [[clang::lifetimebound]]
+#elif __has_cpp_attribute(msvc::lifetimebound)
+#define MERMAID_LIFETIMEBOUND [[msvc::lifetimebound]]
+#endif
+#endif // __has_cpp_attribute
+
 namespace mermaid_cpp::diagrams {
 
 class diagram {
