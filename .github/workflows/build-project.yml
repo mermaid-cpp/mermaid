@@ -65,19 +65,23 @@ jobs:
                     - {
                           system: ubuntu-24.04,
                           config: Debug,
-                          compiler-c: clang-19,
-                          compiler-cxx: clang++-19
+                          compiler-c: clang-20,
+                          compiler-cxx: clang++-20
                       }
-                    # Ubuntu Linux 24.04, Clang 18, Release
+                    # Ubuntu Linux 24.04, Clang 20, Release
                     - {
                           system: ubuntu-24.04,
                           config: Release,
-                          compiler-c: clang-19,
-                          compiler-cxx: clang++-19
+                          compiler-c: clang-20,
+                          compiler-cxx: clang++-20
                       }
             fail-fast: false
 
         runs-on: ${{ matrix.system }}
+
+        env:
+            CC: ${{ matrix.compiler-c }}
+            CXX: ${{ matrix.compiler-cxx }}
 
         steps:
             - name: Checkout
@@ -90,8 +94,9 @@ jobs:
               run: |
                   sudo apt update && \
                   sudo apt install -y \
-                      g++-14 \
-                      clang-19
+                      clang-20 \
+                      libc++-20-dev \
+                      libc++abi-20-dev
 
             - name: Setup Ninja
               uses: imesense/gha-setup-ninja@v0.2
@@ -122,10 +127,13 @@ jobs:
             - name: Install dependencies
               run: |
                   conan \
-                      install . \
-                      --build=missing \
+                      install ${{ env.workspace }} \
                       -of conan-deps \
-                      -s build_type=${{ matrix.config }}
+                      -s build_type=${{ matrix.config }} \
+                      -s compiler=clang \
+                      -s compiler.version=20 \
+                      -s compiler.libcxx=libc++ \
+                      --build=missing
 
             - name: Configure project (Windows)
               if: ${{ runner.os == 'Windows' }}
@@ -144,10 +152,13 @@ jobs:
                       -S ${{ env.workspace }} \
                       -B ${{ env.workspace }}/build \
                       -G "Ninja Multi-Config" \
+                      -D CMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" \
+                      -D CMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps" \
                       -D CMAKE_C_COMPILER=${{ matrix.compiler-c }} \
                       -D CMAKE_CXX_COMPILER=${{ matrix.compiler-cxx }} \
-                      -DCMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" \
-                      -DCMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
+                      -D CMAKE_CXX_FLAGS="-stdlib=libc++" \
+                      -D CMAKE_EXE_LINKER_FLAGS="-stdlib=libc++" \
+                      -D CMAKE_SHARED_LINKER_FLAGS="-stdlib=libc++"
 
             - name: Build project
               run: |
