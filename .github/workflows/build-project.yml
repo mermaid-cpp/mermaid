@@ -42,26 +42,11 @@ jobs:
         strategy:
             matrix:
                 system:
-                    - windows-2022
                     - ubuntu-24.04
                 config:
                     - Debug
                     - Release
                 include:
-                    # Windows Server 2022, Visual C++, Debug
-                    - {
-                          system: windows-2022,
-                          config: Debug,
-                          compiler-c: cl,
-                          compiler-cxx: cl
-                      }
-                    # Windows Server 2022, Visual C++, Release
-                    - {
-                          system: windows-2022,
-                          config: Release,
-                          compiler-c: cl,
-                          compiler-cxx: cl
-                      }
                     # Ubuntu Linux 24.04, GCC 14, Debug
                     - {
                           system: ubuntu-24.04,
