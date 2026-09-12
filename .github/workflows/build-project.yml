@@ -104,14 +104,6 @@ jobs:
             - name: Setup Conan
               uses: imesense/gha-setup-conan@v0.1
 
-            - name: Set path (Windows)
-              if: ${{ runner.os == 'Windows' }}
-              shell: pwsh
-              run: |
-                  $github_workspace = "${{ github.workspace }}"
-                  $workspace = ($github_workspace -replace '\\','/')
-                  Add-Content -Path $env:GITHUB_ENV -Value "workspace=$workspace"
-
             - name: Set path (Linux)
               if: ${{ runner.os != 'Windows' }}
               shell: sh
@@ -134,16 +126,6 @@ jobs:
                       -s compiler.version=20 \
                       -s compiler.libcxx=libc++ \
                       --build=missing
-
-            - name: Configure project (Windows)
-              if: ${{ runner.os == 'Windows' }}
-              run: |
-                  cmake \
-                      -S ${{ env.workspace }} \
-                      -B ${{ env.workspace }}/build \
-                      -G "Ninja Multi-Config" \
-                      -DCMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" \
-                      -DCMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
 
             - name: Configure project (Linux)
               if: ${{ runner.os == 'Linux' }}
