@@ -16,13 +16,19 @@
 #endif
 #endif // __has_cpp_attribute
 
-namespace mermaid_cpp::diagrams {
+namespace mermaid::core {
 
 class diagram {
 public:
 	virtual ~diagram() = default;
 	virtual std::string_view name() const noexcept = 0;
 };
+
+} // namespace mermaid::core
+
+namespace mermaid_cpp::diagrams {
+
+using diagram = mermaid::core::diagram;
 
 class empty_diagram : public diagram {
 public:
