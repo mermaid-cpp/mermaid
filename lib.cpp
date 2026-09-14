@@ -363,7 +363,7 @@ static bool test_all() {
 static const bool test_it = test_all();
 
 template <typename T = parse_state>
-constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_test_diagram(T &&state) {
+constexpr std::expected<std::unique_ptr<core::diagram>, parse_status> parse_test_diagram(T &&state) {
 	const auto &in = state.parsed_string;
 	std::string_view test_label =[&in, &state]() {
 		auto np = std::string_view::npos;
@@ -437,7 +437,7 @@ static constexpr void test_parser_test_diagram() {
 	static_assert(check_res(tests[8]));
 }
 
-constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid(parse_state &state) {
+constexpr std::expected<std::unique_ptr<core::diagram>, parse_status> parse_mermaid(parse_state &state) {
 	using namespace std::string_view_literals;
 
 	const auto &in = state.parsed_string;
@@ -476,7 +476,7 @@ constexpr std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_
 	return parser->second(state);
 }
 
-std::expected<std::unique_ptr<diagrams::diagram>, parse_status> parse_mermaid_md(std::string_view in) {
+std::expected<std::unique_ptr<core::diagram>, parse_status> parse_mermaid_md(std::string_view in) {
 	parse_state state {1, 1, in};
 	constexpr std::string_view mermaid_md_block_begin = "```mermaid";
 	constexpr std::string_view mermaid_md_block_end = "```";
