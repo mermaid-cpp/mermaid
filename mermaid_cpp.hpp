@@ -26,7 +26,7 @@ public:
 
 } // namespace mermaid::core
 
-namespace mermaid_cpp::diagrams {
+namespace mermaid::diagrams {
 
 using diagram = mermaid::core::diagram;
 
@@ -50,7 +50,7 @@ private:
 	std::string label = "";
 };
 
-} // namespace mermaid_cpp::diagrams
+} // namespace mermaid::diagrams
 
 namespace mermaid_cpp::parse_api {
 namespace core = mermaid::core;

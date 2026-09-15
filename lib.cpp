@@ -32,6 +32,7 @@ extern "C" int ff() {
 
 
 namespace mermaid_cpp::parse_api {
+namespace diagrams = mermaid::diagrams;
 
 class parse_state {
 public:
