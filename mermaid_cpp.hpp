@@ -52,7 +52,7 @@ private:
 
 } // namespace mermaid::diagrams
 
-namespace mermaid_cpp::parse_api {
+namespace mermaid::parse_api {
 namespace core = mermaid::core;
 
 class parse_status {
@@ -114,7 +114,7 @@ std::ostream & operator <<(std::ostream &os, const parse_status &status);
 
 std::expected<std::unique_ptr<core::diagram>, parse_status> parse_mermaid_md(std::string_view in);
 
-std::ostream &explain_parse_error(std::ostream &os, const mermaid_cpp::parse_api::parse_status &st, std::string_view context);
+std::ostream &explain_parse_error(std::ostream &os, const mermaid::parse_api::parse_status &st, std::string_view context);
 
 } // namespace mermaid::parse_api
 

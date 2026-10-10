@@ -66,17 +66,17 @@ bool render_diagram(std::string_view outfile = "out.png") {
 }
 
 bool test_app() {
-	auto success_parse_status = mermaid_cpp::parse_api::parse_status::success();
+	auto success_parse_status = mermaid::parse_api::parse_status::success();
 	// empty test.
 	{
-		auto res_empty = mermaid_cpp::parse_api::parse_mermaid_md(R"(```mermaid
+		auto res_empty = mermaid::parse_api::parse_mermaid_md(R"(```mermaid
 	```)");
 		assert(!res_empty);
 		std::cout << error_or(res_empty, success_parse_status) << std::endl;
 	}
 
 	// clang-format off
-	auto result = mermaid_cpp::parse_api::parse_mermaid_md(R"(```mermaid
+	auto result = mermaid::parse_api::parse_mermaid_md(R"(```mermaid
 test
 ```)");
 	// clang-format on
@@ -91,8 +91,8 @@ test
 }
 
 bool test_invalid_app() {
-	auto success_parse_status = mermaid_cpp::parse_api::parse_status::success();
-	auto result = mermaid_cpp::parse_api::parse_mermaid_md(R"(```mermaid
+	auto success_parse_status = mermaid::parse_api::parse_status::success();
+	auto result = mermaid::parse_api::parse_mermaid_md(R"(```mermaid
 vzhuh```)");
 	std::cerr << "test invalid diag: " << error_or(result, success_parse_status) << std::endl;
 

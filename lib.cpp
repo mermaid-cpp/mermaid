@@ -31,7 +31,7 @@ extern "C" int ff() {
 }
 
 
-namespace mermaid_cpp::parse_api {
+namespace mermaid::parse_api {
 namespace diagrams = mermaid::diagrams;
 
 class parse_state {
@@ -290,7 +290,7 @@ constexpr bool skip_all_ws(parse_state &st, bool skip_newline = true) {
 	return st.line != old_line || st.column != old_col;
 }
 
-std::ostream &explain_parse_error(std::ostream &os, const mermaid_cpp::parse_api::parse_status &st, std::string_view context) {
+std::ostream &explain_parse_error(std::ostream &os, const mermaid::parse_api::parse_status &st, std::string_view context) {
 	if (st) {
 		return os;
 	}
@@ -513,4 +513,4 @@ std::expected<std::unique_ptr<core::diagram>, parse_status> parse_mermaid_md(std
 	return result;
 }
 
-} // namespace mermaid_cpp::parse_api
+} // namespace mermaid::parse_api
