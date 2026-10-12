@@ -13,6 +13,8 @@
 #define MERMAID_LIFETIMEBOUND [[clang::lifetimebound]]
 #elif __has_cpp_attribute(msvc::lifetimebound)
 #define MERMAID_LIFETIMEBOUND [[msvc::lifetimebound]]
+#else
+#define MERMAID_LIFETIMEBOUND
 #endif
 #endif // __has_cpp_attribute
 
