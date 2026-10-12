@@ -43,7 +43,7 @@ list(POP_BACK CMAKE_MODULE_PATH)
 find_package(Stb QUIET) # Windows doesn't distinct lower and Capital cases here!
 if(Stb_FOUND)
 	# vcpkg way
-	add_library(stb_lib INTERFACE)
+	add_library(stb_lib INTERFACE IMPORTED)
 	target_include_directories(stb_lib INTERFACE ${Stb_INCLUDE_DIR})
 	add_library(stb::stb ALIAS stb_lib)
 	set(Stb_FOUND TRUE)
@@ -59,7 +59,7 @@ else()
 			REQUIRED
 		)
 		cmake_path(GET mermaid_stb_INCLUDE_DIR ROOT_PATH mermaid_stb_INCLUDE_DIRS)
-		add_library(mermaid_system_stb_stb INTERFACE)
+		add_library(mermaid_system_stb_stb INTERFACE IMPORTED)
 		target_include_directories(mermaid_system_stb_stb INTERFACE ${mermaid_stb_INCLUDE_DIRS})
 		add_library(stb::stb ALIAS mermaid_system_stb_stb)
 		message(STATUS "Use system stb")
