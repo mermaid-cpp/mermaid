@@ -12,7 +12,7 @@
 #]=======================================================================]
 find_package(canvas_ity CONFIG QUIET)
 if(NOT canvas_ity_FOUND)
-	find_path(CANVAS_ITY_INCLUDE_DIRS "canvas_ity.hpp")
+	find_path(CANVAS_ITY_INCLUDE_DIRS "canvas_ity.hpp" REQUIRED)
 	add_library(canvas_ity INTERFACE)
 	target_include_directories(canvas_ity INTERFACE ${CANVAS_ITY_INCLUDE_DIRS})
 	add_library(canvas_ity::canvas_ity ALIAS canvas_ity)
