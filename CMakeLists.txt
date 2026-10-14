@@ -63,3 +63,11 @@ if(MERMAID_BUILD_TESTAPP)
 
 	list(POP_BACK CMAKE_MESSAGE_INDENT)
 endif()
+
+# Install logic
+install(TARGETS mermaid mermaid-renderer-console mermaid-renderer-image EXPORT mermaid-libs
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/mermaid)
+if(MERMAID_BUILD_TESTAPP)
+	install(TARGETS mermaid_testapp EXPORT mermaid-libs)
+endif()
+install(EXPORT mermaid-libs NAMESPACE mermaid:: DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/mermaid FILE mermaid-config.cmake)
