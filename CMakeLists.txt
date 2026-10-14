@@ -8,7 +8,9 @@ find_package(canvas_ity REQUIRED)
 find_package(mermaid_stb REQUIRED) # facade over conan/vcpkg/system stb installation
 find_package(fmt REQUIRED)
 
+include(CMakeDependentOption)
 option(MERMAID_BUILD_TESTAPP "Build simple testapp" ON)
+cmake_dependent_option(MERMAID_ENABLE_INSTALL_CPS_MANIFEST "Enable CPS (Common Package Spec) manifest support for installing lib (Experimental, requires CMake 4.3+)" ON "${CMAKE_VERSION} VERSION_GREATER_EQUAL \"4.3\"" OFF)
 
 # Main lib - parsers for Mermaid diagrams.
 add_library(mermaid lib.cpp)
