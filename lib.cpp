@@ -2,7 +2,7 @@
  * @file        : lib.cpp
  * @created     : Thursday Sep 21, 2023 18:25:26 MSK
  */
-#include <mermaid_cpp.hpp>
+#include <mermaid/mermaid.hpp>
 
 #include <algorithm>
 #include <concepts>

@@ -1,4 +1,4 @@
-#include <mermaid_cpp.hpp>
+#include <mermaid/mermaid.hpp>
 #include <filesystem>
 
 #define CANVAS_ITY_IMPLEMENTATION

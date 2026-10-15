@@ -12,9 +12,10 @@ option(MERMAID_BUILD_TESTAPP "Build simple testapp" ON)
 
 # Main lib - parsers for Mermaid diagrams.
 add_library(mermaid lib.cpp)
-set_target_properties(mermaid PROPERTIES PUBLIC_HEADER "mermaid_cpp.hpp")
+set_target_properties(mermaid PROPERTIES PUBLIC_HEADER "include/mermaid/mermaid.hpp")
 target_compile_features(mermaid PUBLIC cxx_std_23)
 target_include_directories(mermaid PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 # Diagram renderers.
