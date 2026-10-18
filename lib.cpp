@@ -43,7 +43,8 @@ public:
 	}
 
 	constexpr char cur_char() const noexcept {
-		return parsed_string.front();
+		return parsed_string.empty() ? '\0' :
+			parsed_string.front();
 	}
 
 	constexpr size_t increment_line() noexcept {
@@ -69,7 +70,7 @@ public:
 		n = std::min(n, parsed_string.size());
 		for (size_t i = 0; i < n; ++i) {
 			if (check_fn(*this, parsed_string[0])) {
-				parsed_string.remove_prefix(1);
+				advance_to_unsafe(1);
 			} else {
 				return false;
 			}
