@@ -6,6 +6,7 @@
 #include <stddef.h>
 
 #include <span>
+#include <string>
 #include <string_view>
 // https://blog.conan.io/2024/03/21/Introducing-new-conan-visual-studio-extension.html
 // Size of ASCII art
@@ -44,3 +45,46 @@ void image_to_ascii(const std::span<unsigned char> &data, size_t width, size_t h
     }
 }
 
+enum how_to_render_colors {
+    with_color,
+    without_color,
+};
+
+
+template <how_to_render_colors HowRender>
+constexpr std::string image_to_ascii_str_(const std::span<unsigned char> &data, size_t width, size_t height, size_t channels) {
+    // Adjust aspect ratio for ASCII art
+    size_t new_height = static_cast<int>(static_cast<double>(height) / width * new_width * 0.45);
+    std::string result = "";
+
+    for (size_t i = 0; i < new_height; ++i) {
+        for (size_t j = 0; j < new_width; ++j) {
+            size_t old_i = i * height / new_height;
+            size_t old_j = j * width / new_width;
+
+            float r = data[(old_i * width + old_j) * channels + 0] / 255.0f;
+            float g = data[(old_i * width + old_j) * channels + 1] / 255.0f;
+            float b = data[(old_i * width + old_j) * channels + 2] / 255.0f;
+            float luminance = (0.2126f * r + 0.7152f * g + 0.0722f * b);
+
+            char ascii_char = map_luminance_to_ascii(luminance);
+
+            // Use fmt to print ASCII character with color
+            if constexpr (HowRender == with_color) {
+                result += fmt::format(fmt::fg(fmt::rgb(uint8_t(r * 255), uint8_t(g * 255), uint8_t(b * 255))), "{}", ascii_char);
+            } else {
+                result += fmt::format("{}", ascii_char);
+            }
+        }
+        result += "\n";
+    }
+
+    return result;
+}
+
+std::string image_to_ascii_str(const std::span<unsigned char> &data, size_t width, size_t height, size_t channels, bool vt100 = false) {
+    if (vt100) {
+        return image_to_ascii_str_<with_color>(data, width, height, channels);
+    }
+    return image_to_ascii_str_<without_color>(data, width, height, channels);
+}
