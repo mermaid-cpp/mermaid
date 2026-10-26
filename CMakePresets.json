@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default-conan",
+      "displayName": "Default preset with Conan deps (should be installed into ./build/_deps)",
+      "generator": "Ninja",
+      "binaryDir": "build",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": {
+          "type": "STRING",
+          "value": "${sourceDir}/build/_deps"
+        }
+      }
+    },
+    {
+      "name": "default-conan-debug",
+      "displayName": "Default Debug preset with Conan deps (make sure you set the -s build_type=Debug when conan install, or build will fail",
+      "inherits": "default-conan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "default-conan-release",
+      "displayName": "Default Release preset with Conan deps (make sure you set the -s build_type=Release when conan install, or build will fail",
+      "inherits": "default-conan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "default-conan-relwithdebinfo",
+      "displayName": "Default RelWithDebInfo preset with Conan deps (make sure you set the -s build_type=RelWithDebInfo when conan install, or build will fail",
+      "inherits": "default-conan",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    }
+  ]
+}
