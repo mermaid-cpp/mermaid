@@ -3,6 +3,7 @@
  * @created     : Thursday Sep 21, 2023 18:25:26 MSK
  */
 #include <mermaid/mermaid.hpp>
+#include <mermaid/util/scoped_state_restorer.hpp>
 
 #include <algorithm>
 #include <concepts>
@@ -98,33 +99,6 @@ public:
 	}
 };
 
-template <typename T>
-requires std::copyable<T>
-class scoped_state_restorer {
-	T prev_state;
-	T &state_to_restore;
-	bool enabled_;
-public:
-	constexpr scoped_state_restorer(T &state, bool enabled = true)
-		: prev_state(state), state_to_restore(state), enabled_(enabled) {}
-	constexpr bool is_enabled() const noexcept {
-		return enabled_;
-	}
-
-	constexpr void enable(bool new_enabled) noexcept {
-		enabled_ = new_enabled;
-	}
-
-	constexpr ~scoped_state_restorer() {
-		if (enabled_) {
-			state_to_restore = prev_state;
-		}
-	}
-};
-
-template <typename T>
-scoped_state_restorer(T &, bool) -> scoped_state_restorer<T>;
-
 [[deprecated("Use starts_with_and_advance()")]] constexpr bool starts_with(const parse_state &st, std::string_view substr, bool count_chars = true) {
 		return st.parsed_string.starts_with(substr);
 }
@@ -213,7 +187,7 @@ static constexpr bool test_matchers() {
 // FIXME: extract all from starts_with
 constexpr bool starts_with_and_advance(parse_state &st, std::string_view substr) {
 	size_t size = std::min(substr.size(), st.parsed_string.size());
-	scoped_state_restorer scope_restorer(st);
+	util::scoped_state_restorer scope_restorer(st);
 
 	for (auto i = 0; i < size; ++i) {
 		if (substr[i] != st.parsed_string[i]) {
