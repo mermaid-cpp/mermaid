@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(mermaid VERSION 0.0.1 LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
+include(mermaid-log)
 
 include(GNUInstallDirs)
 find_package(canvas_ity REQUIRED)
@@ -33,11 +34,10 @@ target_link_libraries(mermaid-renderer-image fmt::fmt stb::stb)
 
 if(MERMAID_BUILD_TESTAPP)
 	# testapp find fonts logic
-	list(APPEND CMAKE_MESSAGE_INDENT "mermaid-cpp: ")
-	message(STATUS "build testapp")
+	mermaid_log(STATUS "build testapp")
 
-	message(CHECK_START "find default font for testapp")
-	message(STATUS "Using font dir: ${MERMAID_FONTS_DIR}")
+	mermaid_log(CHECK_START "find default font for testapp")
+	mermaid_log(STATUS "Using font dir: ${MERMAID_FONTS_DIR}")
 
 	# Find fonts for testapp renderer
 	set(MERMAID_FONTS_DIR "${CMAKE_INSTALL_FULL_DATADIR}/fonts" CACHE PATH "Default fonts path")
@@ -53,14 +53,13 @@ if(MERMAID_BUILD_TESTAPP)
 
 	# add font if found
 	if(MERMAID_TESTAPP_TTF_FILENAME)
-		message(CHECK_PASS "found at path ${MERMAID_TESTAPP_TTF_FILENAME}")
+		mermaid_log(CHECK_PASS "found at path ${MERMAID_TESTAPP_TTF_FILENAME}")
 		target_compile_definitions(mermaid_testapp PUBLIC MERMAID_TESTAPP_TTF_FILENAME="${MERMAID_TESTAPP_TTF_FILENAME}")
 	else()
-		message(CHECK_FAIL "DejaVuSans default testapp font did not found. The testapp won't render fonts properly")
+		mermaid_log(CHECK_FAIL "DejaVuSans default testapp font did not found. The testapp won't render fonts properly")
 	endif()
 
 	enable_testing()
 	add_test(NAME testapp COMMAND ${CMAKE_CURRENT_BUILD_DIR}/mermaid_testapp)
 
-	list(POP_BACK CMAKE_MESSAGE_INDENT)
 endif()
