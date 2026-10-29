@@ -8,7 +8,8 @@ include(GNUInstallDirs)
 
 # Base options.
 option(MERMAID_BUILD_TESTAPP "Build simple testapp" ON)
-option(MERMAID_ENABLE_RENDERERS "Enable renderers (disable if: fuzz/parser tests/system build/custom renderer logic" OFF)
+option(MERMAID_BUILD_TESTS "Enable tests" "${BUILD_TESTING}")
+option(MERMAID_ENABLE_RENDERERS "Enable renderers (disable if: fuzz/parser tests/system build/custom renderer logic)" OFF)
 
 
 # Deps.
@@ -76,7 +77,9 @@ if(MERMAID_BUILD_TESTAPP)
 		mermaid_log(CHECK_FAIL "DejaVuSans default testapp font did not found. The testapp won't render fonts properly")
 	endif()
 
-	enable_testing()
-	add_test(NAME testapp COMMAND ${CMAKE_CURRENT_BUILD_DIR}/mermaid_testapp)
-
+	if(MERMAID_BUILD_TESTS)
+		enable_testing()
+		add_test(NAME testapp COMMAND ${CMAKE_CURRENT_BUILD_DIR}/mermaid_testapp)
+		set_tests_properties(testapp PROPERTIES LABELS "unit;testapp")
+	endif()
 endif()
