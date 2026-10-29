@@ -1,5 +1,4 @@
 #include <mermaid/mermaid.hpp>
-#include <filesystem>
 
 #define CANVAS_ITY_IMPLEMENTATION
 #include <canvas_ity.hpp>
@@ -35,11 +34,6 @@ void image_to_ascii(const std::span<unsigned char> &data, size_t width, size_t h
 
 void image_data_to_file(const std::span<unsigned char> &data, size_t width, size_t height, size_t channels, std::filesystem::path outfile);
 
-template <typename T, typename E>
-constexpr decltype(auto) error_or(const T& t, const E& e) {
-	return t.has_value() ? e : t.error();
-}
-
 bool render_diagram(std::string_view outfile = "out.png") {
 
 	const size_t W = 100, H = 50;
@@ -72,7 +66,7 @@ bool test_app() {
 		auto res_empty = mermaid::syntax::parse_mermaid_md(R"(```mermaid
 	```)");
 		assert(!res_empty);
-		std::cout << error_or(res_empty, success_parse_status) << std::endl;
+		std::cout << res_empty.error_or(success_parse_status) << std::endl;
 	}
 
 	// clang-format off
@@ -80,21 +74,18 @@ bool test_app() {
 test
 ```)");
 	// clang-format on
-	std::cerr << "<expected> version: " <<  __cpp_lib_expected << std::endl;
-	std::cerr << error_or(result, success_parse_status) << std::endl;
+	std::cerr << result.error_or(success_parse_status) << std::endl;
 	assert(result);
 
-
-
 	render_diagram();
-	return result.operator bool();
+	return result.has_value();
 }
 
 bool test_invalid_app() {
 	auto success_parse_status = mermaid::syntax::parse_status::success();
 	auto result = mermaid::syntax::parse_mermaid_md(R"(```mermaid
 vzhuh```)");
-	std::cerr << "test invalid diag: " << error_or(result, success_parse_status) << std::endl;
+	std::cerr << "test invalid diag: " << result.error_or(success_parse_status) << std::endl;
 
 	return false;
 }
