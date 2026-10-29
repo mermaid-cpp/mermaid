@@ -1,15 +1,20 @@
 cmake_minimum_required(VERSION 3.20)
 project(mermaid VERSION 0.0.1 LANGUAGES C CXX)
 
+# CMake modules.
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 include(mermaid-log)
-
 include(GNUInstallDirs)
+
+# Base options.
+option(MERMAID_BUILD_TESTAPP "Build simple testapp" ON)
+
+
+# Deps.
 find_package(canvas_ity REQUIRED)
 find_package(mermaid_stb REQUIRED) # facade over conan/vcpkg/system stb installation
 find_package(fmt REQUIRED)
 
-option(MERMAID_BUILD_TESTAPP "Build simple testapp" ON)
 
 # Main lib - parsers for Mermaid diagrams.
 add_library(mermaid lib.cpp)
