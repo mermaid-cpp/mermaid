@@ -1,7 +1,12 @@
 #include <mermaid/mermaid.hpp>
 
+#ifndef MERMAID_NO_RENDERERS
+
 #define CANVAS_ITY_IMPLEMENTATION
 #include <canvas_ity.hpp>
+
+#endif
+
 
 #include <filesystem>
 #include <fstream>
@@ -36,6 +41,7 @@ void image_data_to_file(const std::span<unsigned char> &data, size_t width, size
 
 bool render_diagram(std::string_view outfile = "out.png") {
 
+#ifndef MERMAID_NO_RENDERERS
 	const size_t W = 100, H = 50;
 	canvas_ity::canvas canvas(W, H);
 	auto font = load_ttf_file(MERMAID_TESTAPP_TTF_FILENAME);
@@ -57,6 +63,10 @@ bool render_diagram(std::string_view outfile = "out.png") {
 	image_data_to_file(canvas_data, W, H, 4, outfile);
 
 	return true;
+#else
+	std::cerr << "Renderers are disabled.\n";
+	return false;
+#endif
 }
 
 bool test_app() {

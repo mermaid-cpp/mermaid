@@ -8,11 +8,15 @@ include(GNUInstallDirs)
 
 # Base options.
 option(MERMAID_BUILD_TESTAPP "Build simple testapp" ON)
+option(MERMAID_ENABLE_RENDERERS "Enable renderers (disable if: fuzz/parser tests/system build/custom renderer logic" OFF)
 
 
 # Deps.
-find_package(canvas_ity REQUIRED)
-find_package(mermaid_stb REQUIRED) # facade over conan/vcpkg/system stb installation
+if(MERMAID_ENABLE_RENDERERS)
+	find_package(canvas_ity REQUIRED)
+	find_package(mermaid_stb REQUIRED) # facade over conan/vcpkg/system stb installation
+endif()
+
 find_package(fmt REQUIRED)
 
 
@@ -23,18 +27,20 @@ target_compile_features(mermaid PUBLIC cxx_std_23)
 target_include_directories(mermaid PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}>
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
+target_link_libraries(mermaid PRIVATE fmt::fmt)
 
 # Diagram renderers.
 #
 
-target_link_libraries(mermaid PRIVATE fmt::fmt)
-add_library(mermaid-renderer-console renderer-fmt-console.cpp)
-target_compile_features(mermaid-renderer-console PUBLIC cxx_std_23)
-target_link_libraries(mermaid-renderer-console fmt::fmt)
+if(MERMAID_ENABLE_RENDERERS)
+	add_library(mermaid-renderer-console renderer-fmt-console.cpp)
+	target_compile_features(mermaid-renderer-console PUBLIC cxx_std_23)
+	target_link_libraries(mermaid-renderer-console fmt::fmt)
 
-add_library(mermaid-renderer-image renderer-stb-image.cpp)
-target_compile_features(mermaid-renderer-image PUBLIC cxx_std_23)
-target_link_libraries(mermaid-renderer-image fmt::fmt stb::stb)
+	add_library(mermaid-renderer-image renderer-stb-image.cpp)
+	target_compile_features(mermaid-renderer-image PUBLIC cxx_std_23)
+	target_link_libraries(mermaid-renderer-image fmt::fmt stb::stb)
+endif()
 
 
 if(MERMAID_BUILD_TESTAPP)
@@ -54,7 +60,13 @@ if(MERMAID_BUILD_TESTAPP)
 
 	# Main testapp (PoC).
 	add_executable(mermaid_testapp main.cpp)
-	target_link_libraries(mermaid_testapp mermaid mermaid-renderer-console mermaid-renderer-image canvas_ity::canvas_ity)
+	target_link_libraries(mermaid_testapp mermaid)
+	if(MERMAID_ENABLE_RENDERERS)
+		target_link_libraries(mermaid_testapp mermaid-renderer-console mermaid-renderer-image canvas_ity::canvas_ity)
+	else()
+		target_compile_definitions(mermaid_testapp PRIVATE MERMAID_NO_RENDERERS=1)
+		mermaid_log(STATUS "Info: testapp will be w/o actual renderers")
+	endif()
 
 	# add font if found
 	if(MERMAID_TESTAPP_TTF_FILENAME)
