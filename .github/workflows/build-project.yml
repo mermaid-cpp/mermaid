@@ -146,11 +146,11 @@ jobs:
               if: ${{ runner.os == 'Windows' }}
               shell: pwsh
               run: |
-                  cmake \
-                      -S ${{ env.workspace }} \
-                      -B ${{ env.workspace }}/build \
-                      -G "Ninja Multi-Config" \
-                      -DCMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" \
+                  cmake `
+                      -S ${{ env.workspace }} `
+                      -B ${{ env.workspace }}/build `
+                      -G "Ninja Multi-Config" `
+                      -DCMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" `
                       -DCMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
 
             - name: Configure project (Linux)
