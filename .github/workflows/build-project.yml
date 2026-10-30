@@ -62,6 +62,7 @@ jobs:
                           compiler-c: cl,
                           compiler-cxx: cl
                       }
+
                     # Ubuntu Linux 24.04, GCC 14, Debug
                     - {
                           system: ubuntu-24.04,
@@ -76,6 +77,7 @@ jobs:
                           compiler-c: gcc-14,
                           compiler-cxx: g++-14
                       }
+
                     # Ubuntu Linux 24.04, Clang 18, Debug
                     - {
                           system: ubuntu-24.04,
@@ -90,6 +92,7 @@ jobs:
                           compiler-c: clang-19,
                           compiler-cxx: clang++-19
                       }
+
             fail-fast: false
 
         runs-on: ${{ matrix.system }}
@@ -114,16 +117,19 @@ jobs:
             - name: Setup Conan
               uses: imesense/gha-setup-conan@v0.1
 
+            - name: Enable Visual Studio Command Prompt (Visual C++)
+              if: ${{ matrix.compiler-c == 'cl' && matrix.compiler-cxx == 'cl' }}
+              uses: ilammy/msvc-dev-cmd@v1
+
             - name: Set path (Windows)
               if: ${{ runner.os == 'Windows' }}
               shell: pwsh
               run: |
                   $github_workspace = "${{ github.workspace }}"
                   $workspace = ($github_workspace -replace '\\','/')
-                  Add-Content -Path $env:GITHUB_ENV -Value "workspace=$workspace"
-            - name: Set msvc command prompt (Windows)
-              if: ${{ runner.os == 'Windows' }}
-              uses: ilammy/msvc-dev-cmd@v1
+                  Add-Content `
+                      -Path $env:GITHUB_ENV `
+                      -Value "workspace=$workspace"
 
             - name: Set path (Linux)
               if: ${{ runner.os != 'Windows' }}
@@ -148,14 +154,13 @@ jobs:
             - name: Configure project (Windows)
               if: ${{ runner.os == 'Windows' }}
               shell: pwsh
-              
               run: |
                   cmake `
                       -S ${{ env.workspace }} `
                       -B ${{ env.workspace }}/build `
                       -G "Ninja Multi-Config" `
-                      -DCMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" `
-                      -DCMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
+                      -D CMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" `
+                      -D CMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
 
             - name: Configure project (Linux)
               if: ${{ runner.os == 'Linux' }}
@@ -166,8 +171,8 @@ jobs:
                       -G "Ninja Multi-Config" \
                       -D CMAKE_C_COMPILER=${{ matrix.compiler-c }} \
                       -D CMAKE_CXX_COMPILER=${{ matrix.compiler-cxx }} \
-                      -DCMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" \
-                      -DCMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
+                      -D CMAKE_PREFIX_PATH="${{ env.workspace }}/conan-deps" \
+                      -D CMAKE_MODULE_PATH="${{ env.workspace }}/conan-deps"
 
             - name: Build project
               run: |
