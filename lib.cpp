@@ -381,7 +381,25 @@ static constexpr void test_parser_test_diagram() {
 		std::string_view text;
 		diagrams::test_diagram expected;
 	};
-	constexpr test_data tests[] {
+
+// Workaround for build on non-libcxx:
+// as libcxx string could magically
+// work w/o allocations on constexpr
+// the following tests are fully constexpr
+// on libcxx. But another stblibs didn't
+// offer such feature, so guard this
+// constexpr test on another stdlibs.
+// Task #25 tracks status about this issue
+// and workaround.
+#ifdef _LIBCXX
+#define constexpr_on_libcxx constexpr
+#define static_assert_if_libcxx static_assert
+#else
+#define constexpr_on_libcxx const
+#define static_assert_if_libcxx assert
+#endif
+
+	constexpr_on_libcxx test_data tests[] {
 		{"", {""}},
 		{"```", {""}},
 		{"meow```", {"meow"}},
@@ -402,15 +420,15 @@ static constexpr void test_parser_test_diagram() {
 			) == d.expected;
 	};
 
-	static_assert(check_res(tests[0]));
-	static_assert(check_res(tests[1]));
-	static_assert(check_res(tests[2]));
-	static_assert(check_res(tests[3]));
-	static_assert(check_res(tests[4]));
-	static_assert(check_res(tests[5]));
-	static_assert(check_res(tests[6]));
-	static_assert(check_res(tests[7]));
-	static_assert(check_res(tests[8]));
+	static_assert_if_libcxx(check_res(tests[0]));
+	static_assert_if_libcxx(check_res(tests[1]));
+	static_assert_if_libcxx(check_res(tests[2]));
+	static_assert_if_libcxx(check_res(tests[3]));
+	static_assert_if_libcxx(check_res(tests[4]));
+	static_assert_if_libcxx(check_res(tests[5]));
+	static_assert_if_libcxx(check_res(tests[6]));
+	static_assert_if_libcxx(check_res(tests[7]));
+	static_assert_if_libcxx(check_res(tests[8]));
 }
 
 constexpr std::expected<std::unique_ptr<core::diagram>, parse_status> parse_mermaid(parse_state &state) {
