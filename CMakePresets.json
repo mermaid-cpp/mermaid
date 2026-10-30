@@ -41,6 +41,15 @@
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo"
       }
+    },
+    {
+      "name": "default-system",
+      "displayName": "Default preset with system deps (disables the renderers for now)",
+      "generator": "Ninja",
+      "binaryDir": "build",
+      "cacheVariables": {
+        "MERMAID_ENABLE_RENDERERS": "OFF"
+      }
     }
   ]
 }
