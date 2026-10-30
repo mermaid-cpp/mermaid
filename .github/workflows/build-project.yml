@@ -145,6 +145,7 @@ jobs:
             - name: Configure project (Windows)
               if: ${{ runner.os == 'Windows' }}
               shell: pwsh
+              
               run: |
                   cmake `
                       -S ${{ env.workspace }} `
@@ -155,6 +156,7 @@ jobs:
 
             - name: Configure project (Linux)
               if: ${{ runner.os == 'Linux' }}
+              uses: ilammy/msvc-dev-cmd@v1
               run: |
                   cmake \
                       -S ${{ env.workspace }} \
