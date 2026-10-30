@@ -144,6 +144,7 @@ jobs:
 
             - name: Configure project (Windows)
               if: ${{ runner.os == 'Windows' }}
+              shell: pwsh
               run: |
                   cmake \
                       -S ${{ env.workspace }} \
