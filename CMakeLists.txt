@@ -34,6 +34,10 @@ target_link_libraries(mermaid PRIVATE fmt::fmt)
 #
 
 if(MERMAID_ENABLE_RENDERERS)
+	add_library(mermaid-renderer renderer.cpp)
+	target_compile_features(mermaid-renderer PUBLIC cxx_std_23)
+	target_link_libraries(mermaid-renderer canvas_ity::canvas_ity)
+
 	add_library(mermaid-renderer-console renderer-fmt-console.cpp)
 	target_compile_features(mermaid-renderer-console PUBLIC cxx_std_23)
 	target_link_libraries(mermaid-renderer-console fmt::fmt)
@@ -41,6 +45,11 @@ if(MERMAID_ENABLE_RENDERERS)
 	add_library(mermaid-renderer-image renderer-stb-image.cpp)
 	target_compile_features(mermaid-renderer-image PUBLIC cxx_std_23)
 	target_link_libraries(mermaid-renderer-image fmt::fmt stb::stb)
+
+	# link all specific renderers into the umbrella lib
+	target_link_libraries(mermaid-renderer mermaid-renderer-image mermaid-renderer-console)
+else()
+	add_library(mermaid-renderer INTERFACE)
 endif()
 
 
@@ -63,7 +72,7 @@ if(MERMAID_BUILD_TESTAPP)
 	add_executable(mermaid_testapp main.cpp)
 	target_link_libraries(mermaid_testapp mermaid)
 	if(MERMAID_ENABLE_RENDERERS)
-		target_link_libraries(mermaid_testapp mermaid-renderer-console mermaid-renderer-image canvas_ity::canvas_ity)
+		target_link_libraries(mermaid_testapp mermaid-renderer)
 	else()
 		target_compile_definitions(mermaid_testapp PRIVATE MERMAID_NO_RENDERERS=1)
 		mermaid_log(STATUS "Info: testapp will be w/o actual renderers")
@@ -72,7 +81,9 @@ if(MERMAID_BUILD_TESTAPP)
 	# add font if found
 	if(MERMAID_TESTAPP_TTF_FILENAME)
 		mermaid_log(CHECK_PASS "found at path ${MERMAID_TESTAPP_TTF_FILENAME}")
-		target_compile_definitions(mermaid_testapp PUBLIC MERMAID_TESTAPP_TTF_FILENAME="${MERMAID_TESTAPP_TTF_FILENAME}")
+		if (MERMAID_ENABLE_RENDERERS)
+			target_compile_definitions(mermaid-renderer PUBLIC MERMAID_TESTAPP_TTF_FILENAME="${MERMAID_TESTAPP_TTF_FILENAME}")
+		endif()
 	else()
 		mermaid_log(CHECK_FAIL "DejaVuSans default testapp font did not found. The testapp won't render fonts properly")
 	endif()
