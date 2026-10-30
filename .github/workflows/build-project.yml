@@ -114,6 +114,11 @@ jobs:
             - name: Setup Conan
               uses: imesense/gha-setup-conan@v0.1
 
+            - name: Enable Visual Studio Command Prompt (Visual C++)
+              if: ${{ matrix.compiler-c == 'cl' && matrix.compiler-cxx == 'cl' }}
+              uses: ilammy/msvc-dev-cmd@v1
+
+
             - name: Set path (Windows)
               if: ${{ runner.os == 'Windows' }}
               shell: pwsh
