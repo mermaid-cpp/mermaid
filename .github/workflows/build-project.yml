@@ -121,6 +121,9 @@ jobs:
                   $github_workspace = "${{ github.workspace }}"
                   $workspace = ($github_workspace -replace '\\','/')
                   Add-Content -Path $env:GITHUB_ENV -Value "workspace=$workspace"
+            - name: Set msvc command prompt (Windows)
+              if: ${{ runner.os == 'Windows' }}
+              uses: ilammy/msvc-dev-cmd@v1
 
             - name: Set path (Linux)
               if: ${{ runner.os != 'Windows' }}
@@ -156,7 +159,6 @@ jobs:
 
             - name: Configure project (Linux)
               if: ${{ runner.os == 'Linux' }}
-              uses: ilammy/msvc-dev-cmd@v1
               run: |
                   cmake \
                       -S ${{ env.workspace }} \
