@@ -1,5 +1,9 @@
 # yaml-language-server: $schema=https://json.schemastore.org/dependabot-2.0.json
 
+# SPDX-FileCopyrightText: 2026 mermaid-cpp contributors <https://github.com/mermaid-cpp/mermaid>
+#
+# SPDX-License-Identifier: MIT
+
 version: 2
 
 updates:

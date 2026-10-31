@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2023-2026 mermaid-cpp contributors <https://github.com/mermaid-cpp/mermaid>
+
+SPDX-License-Identifier: MIT
+-->
+
 # mermaid-cpp
 
 **Mermaid-cpp** is an implementation of [mermaid-js](https://github.com/mermaid-js/mermaid) in C++ (with possibility to compile back into WASM/Emscripten).
@@ -32,3 +38,7 @@ but it is not tested or supported yet.
 
 Can be viewed on [mermaid-js docs site](http://mermaid.js.org/intro/).
 
+## License
+The license indication in the project's sources is compliant with the [REUSE specification v3.3][reuse.spec].
+
+[reuse.spec]: https://reuse.software/spec-3.3/
