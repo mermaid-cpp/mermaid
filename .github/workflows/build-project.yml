@@ -47,49 +47,48 @@ jobs:
                 config:
                     - Debug
                     - Release
+                compiler:
+                    - clang
+                    - gcc
+                    - msvc
+                exclude:
+                    - system: ubuntu-24.04
+                      compiler: msvc
+                    - system: windows-2022
+                      compiler: clang
                 include:
-                    # Windows Server 2022, Visual C++, Debug
+                    # Windows Server 2022, Visual C++
                     - {
                           system: windows-2022,
-                          config: Debug,
+                          compiler: msvc,
                           compiler-c: cl,
                           compiler-cxx: cl
                       }
-                    # Windows Server 2022, Visual C++, Release
+
+                    # Windows Server 2022, MinGW
                     - {
                           system: windows-2022,
-                          config: Release,
-                          compiler-c: cl,
-                          compiler-cxx: cl
+                          compiler: gcc,
+                          compiler-c: gcc,
+                          compiler-cxx: g++
                       }
-                    # Ubuntu Linux 24.04, GCC 14, Debug
+
+                    # Ubuntu Linux 24.04, Clang-19
                     - {
                           system: ubuntu-24.04,
-                          config: Debug,
-                          compiler-c: gcc-14,
-                          compiler-cxx: g++-14
-                      }
-                    # Ubuntu Linux 24.04, GCC 14, Release
-                    - {
-                          system: ubuntu-24.04,
-                          config: Release,
-                          compiler-c: gcc-14,
-                          compiler-cxx: g++-14
-                      }
-                    # Ubuntu Linux 24.04, Clang 18, Debug
-                    - {
-                          system: ubuntu-24.04,
-                          config: Debug,
+                          compiler: clang,
                           compiler-c: clang-19,
                           compiler-cxx: clang++-19
                       }
-                    # Ubuntu Linux 24.04, Clang 18, Release
+
+                    # Ubuntu Linux 24.04, GCC 14
                     - {
                           system: ubuntu-24.04,
-                          config: Release,
-                          compiler-c: clang-19,
-                          compiler-cxx: clang++-19
+                          compiler: gcc,
+                          compiler-c: gcc-14,
+                          compiler-cxx: g++-14
                       }
+
             fail-fast: false
 
         runs-on: ${{ matrix.system }}
@@ -137,6 +136,10 @@ jobs:
                   echo "workspace=$workspace" >> $GITHUB_ENV
 
             - name: Detect build profile
+              env:
+                CC: ${{ matrix.compiler-c }}
+                CXX: ${{ matrix.compiler-cxx }}
+
               run: |
                   conan \
                       profile detect
@@ -148,6 +151,10 @@ jobs:
                       --build=missing \
                       -of conan-deps \
                       -s build_type=${{ matrix.config }}
+              env:
+                CC: ${{ matrix.compiler-c }}
+                CXX: ${{ matrix.compiler-cxx }}
+
 
             - name: Configure project (Windows)
               if: ${{ runner.os == 'Windows' }}
