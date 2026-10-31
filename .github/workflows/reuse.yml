@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: 2026 mermaid-cpp contributors <https://github.com/mermaid-cpp/mermaid>
+#
+# SPDX-License-Identifier: MIT
+
+name: reuse.yml
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "master"
+      - "dev"
+
+jobs:
+  reuse:
+    runs-on: ubuntu-26.04
+    steps:
+      - name: Check out the sources
+        uses: actions/checkout@v7
+      - name: REUSE metadata check
+        uses: fsfe/reuse-action@v6
