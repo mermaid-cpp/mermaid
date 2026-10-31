@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2024-2026 mermaid-cpp contributors <https://github.com/mermaid-cpp/mermaid>
+#
+# SPDX-License-Identifier: MIT
+
 cmake_minimum_required(VERSION 3.20)
 project(mermaid VERSION 0.0.1 LANGUAGES C CXX)
 

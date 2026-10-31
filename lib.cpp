@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2024-2026 mermaid-cpp contributors <https://github.com/mermaid-cpp/mermaid>
+//
+// SPDX-License-Identifier: MIT
+
 /**
  * @file        : lib.cpp
  * @created     : Thursday Sep 21, 2023 18:25:26 MSK

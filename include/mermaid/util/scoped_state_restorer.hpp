@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 mermaid-cpp contributors <https://github.com/mermaid-cpp/mermaid>
+//
+// SPDX-License-Identifier: MIT
+
 #ifndef LB_MERMAID_UTIL_HPP_
 #define LB_MERMAID_UTIL_HPP_
 #include <ranges>

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 mermaid-cpp contributors <https://github.com/mermaid-cpp/mermaid>
+#
+# SPDX-License-Identifier: MIT
+
 #[=======================================================================[.rst:
 mermaid-log.cmake
 -----------------
