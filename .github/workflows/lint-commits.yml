@@ -51,6 +51,6 @@ jobs:
 
             # Run commit linter from parent branch.
             - name: Lint commits
-              uses: remarkablemark/commitlint@v1
+              uses: remarkablemark/commitlint@v2
               with:
                   from: ${{ env.branch }}
