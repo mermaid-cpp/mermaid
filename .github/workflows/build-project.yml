@@ -99,10 +99,10 @@ jobs:
                       libc++abi-20-dev
 
             - name: Setup Ninja
-              uses: imesense/gha-setup-ninja@v0.2
+              uses: imesense/gha-setup-ninja@v0.4
 
             - name: Setup Conan
-              uses: imesense/gha-setup-conan@v0.1
+              uses: imesense/gha-setup-conan@v0.3
 
             - name: Set path (Linux)
               if: ${{ runner.os != 'Windows' }}
